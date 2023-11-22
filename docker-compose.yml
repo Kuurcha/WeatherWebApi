@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  webapplication1:
+    image: ${DOCKER_REGISTRY-}webapplication1
+    ports:
+        - "7091:80"
+        - "7090:443"
+    build:
+      context: .
+      dockerfile: WebApplication1/Dockerfile
+    depends_on: 
+        - "weatherdb"
+  weatherdb:
+    image: postgres
+    environment:
+      POSTGRES_DB: "MoscowWeatherDB"
+      POSTGRES_USER: "MoscowWeatherUser"
+      POSTGRES_PASSWORD: "SomeExamplePassword"
+    ports:
+      - "5432:5432"
+    volumes:
+      - E:\Work\Data:/var/opt/mssql/data
