@@ -5,12 +5,13 @@ using WebWeatherApi.Entities.ModelConfiguration;
 namespace WebWeatherApi.Entities.Model
 {
     [Table(nameof(WeatherDetails))]
-    [EntityTypeConfiguration(typeof(WeatherConfiguration))]
+    [EntityTypeConfiguration(typeof(WeatherDetailsConfiguration))]
     public class WeatherDetails
     {
+
         public int Id { get; set; }
 
-        public DateTime date { get; set; }
+        public string date { get; set; }
 
     }
 }

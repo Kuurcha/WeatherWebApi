@@ -13,6 +13,8 @@ namespace WebWeatherApi.Entities.ModelConfiguration
 
         public DbSet<WeatherDetails> WeatherDetails { get; set; }
 
+        public DbSet<WeatherRecord> WeatherRecords { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }

@@ -4,7 +4,7 @@ using WebWeatherApi.Entities.Model;
 
 namespace WebWeatherApi.Entities.ModelConfiguration
 {
-    public class WeatherConfiguration : IEntityTypeConfiguration<WeatherDetails>
+    public class WeatherDetailsConfiguration : IEntityTypeConfiguration<WeatherDetails>
     {
         public void Configure(EntityTypeBuilder<WeatherDetails> builder)
         {
