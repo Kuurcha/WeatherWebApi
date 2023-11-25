@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace WebWeatherApi.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitalMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -50,24 +50,12 @@ namespace WebWeatherApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WeatherDetails",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    date = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WeatherDetails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WeatherRecord",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Description = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,6 +187,34 @@ namespace WebWeatherApi.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WeatherDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Temperature = table.Column<string>(type: "text", nullable: false),
+                    Humidty = table.Column<int>(type: "integer", nullable: true),
+                    DewPoint = table.Column<double>(type: "double precision", nullable: true),
+                    Pressure = table.Column<double>(type: "double precision", nullable: true),
+                    WindDirection = table.Column<string>(type: "text", nullable: true),
+                    WindSpeed = table.Column<int>(type: "integer", nullable: true),
+                    Cloudiness = table.Column<int>(type: "integer", nullable: true),
+                    CloudBase = table.Column<int>(type: "integer", nullable: true),
+                    Visibility = table.Column<int>(type: "integer", nullable: true),
+                    WeatherRecordId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WeatherDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WeatherDetails_WeatherRecord_WeatherRecordId",
+                        column: x => x.WeatherRecordId,
+                        principalTable: "WeatherRecord",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -235,6 +251,11 @@ namespace WebWeatherApi.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WeatherDetails_WeatherRecordId",
+                table: "WeatherDetails",
+                column: "WeatherRecordId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -261,13 +282,13 @@ namespace WebWeatherApi.Migrations
                 name: "WeatherDetails");
 
             migrationBuilder.DropTable(
-                name: "WeatherRecord");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "WeatherRecord");
         }
     }
 }

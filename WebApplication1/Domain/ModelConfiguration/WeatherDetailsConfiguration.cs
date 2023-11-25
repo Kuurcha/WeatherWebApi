@@ -10,6 +10,13 @@ namespace WebWeatherApi.Entities.ModelConfiguration
         {
             builder.HasKey(wd => wd.Id);
             builder.Property(wd => wd.Id).ValueGeneratedOnAdd();
+
+            builder.HasOne(wd => wd.WeatherRecord).
+                 WithMany(wr => wr.WeatherRecords)
+                 .HasForeignKey(wr => wr.WeatherRecordId);
+
+            builder.Property(wd => wd.Date).IsRequired();
+            builder.Property(wd => wd.Temperature).IsRequired();
         }
     }
 }

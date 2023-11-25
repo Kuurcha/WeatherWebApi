@@ -226,11 +226,43 @@ namespace WebWeatherApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("date")
+                    b.Property<int?>("CloudBase")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Cloudiness")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("DewPoint")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("Humidty")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("Pressure")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Temperature")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("Visibility")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("WeatherRecordId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("WindDirection")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("WindSpeed")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WeatherRecordId");
 
                     b.ToTable("WeatherDetails");
                 });
@@ -242,6 +274,10 @@ namespace WebWeatherApi.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -322,6 +358,20 @@ namespace WebWeatherApi.Migrations
                         });
 
                     b.Navigation("refreshToken");
+                });
+
+            modelBuilder.Entity("WebWeatherApi.Entities.Model.WeatherDetails", b =>
+                {
+                    b.HasOne("WebWeatherApi.Entities.Model.WeatherRecord", "WeatherRecord")
+                        .WithMany("WeatherRecords")
+                        .HasForeignKey("WeatherRecordId");
+
+                    b.Navigation("WeatherRecord");
+                });
+
+            modelBuilder.Entity("WebWeatherApi.Entities.Model.WeatherRecord", b =>
+                {
+                    b.Navigation("WeatherRecords");
                 });
 #pragma warning restore 612, 618
         }

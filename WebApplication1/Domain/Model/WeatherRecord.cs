@@ -9,5 +9,9 @@ namespace WebWeatherApi.Entities.Model
     public class WeatherRecord
     {
         public int Id { get; set; }
+
+        public string Description { get; set; }
+
+        public ICollection<WeatherDetails> WeatherRecords { get; set; }
     }
 }

@@ -10,6 +10,8 @@ namespace WebWeatherApi.Domain.ModelConfiguration
         {
             builder.HasKey(wr => wr.Id);
             builder.Property(wr => wr.Id).ValueGeneratedOnAdd();
+
+
         }
     }
 }

@@ -11,7 +11,29 @@ namespace WebWeatherApi.Entities.Model
 
         public int Id { get; set; }
 
-        public string date { get; set; }
+        public DateTime Date { get; set; }
+
+        public string Temperature { get; set; }
+
+        public int? Humidty { get; set; }
+
+        public double? DewPoint { get; set; }
+
+        public double? Pressure { get; set; }
+
+        public string? WindDirection { get; set; }
+
+        public int? WindSpeed { get; set; }
+
+        public int? Cloudiness { get; set; }
+
+        public int? CloudBase { get; set; }
+
+        public int? Visibility { get; set; }
+
+        public int? WeatherRecordId { get; set; }
+
+        public WeatherRecord? WeatherRecord { get; set; }
 
     }
 }
