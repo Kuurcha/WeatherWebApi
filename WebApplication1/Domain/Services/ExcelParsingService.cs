@@ -10,12 +10,11 @@ namespace WebWeatherApi.Domain.Services
     public class ExcelParsingService
     {
         private readonly int amountOfRows = 11;
-        private readonly ContextService _contextService;
+
         private readonly ApplicationDbContext _context;
 
-        public ExcelParsingService(ContextService contextService, ApplicationDbContext context)
+        public ExcelParsingService(ApplicationDbContext context)
         {
-            _contextService = contextService;
             _context = context;
         }
 
@@ -24,12 +23,10 @@ namespace WebWeatherApi.Domain.Services
             return row.GetCell(i, MissingCellPolicy.RETURN_BLANK_AS_NULL)?.ToString();
         }
 
-        public DateTime? parseDateTime(string date, string time)
+        public DateTimeOffset? parseDateTime(string date, string time)
         {
             string dateTimeString = $"{date} {time}";
-
-
-            if (DateTime.TryParseExact(dateTimeString, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+            if (DateTimeOffset.TryParseExact(dateTimeString, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset result))
                 return result;
             return null;
         }
@@ -51,16 +48,16 @@ namespace WebWeatherApi.Domain.Services
                         string? time = getCellValue(row, 1);
 
                         if (date == null || time == null)
-                            InvalidFormatException.ThrowInvalidDateFormatException(date, time);
+                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time);
 
                         string? temperature = getCellValue(row, 2);
 
                         if (temperature == null)
-                            throw new InvalidFormatException("Temperature for the record should be specified");
+                            throw new InvalidExcelFormatException("Temperature for the record should be specified");
 
-                        DateTime? dateTime = parseDateTime(date!, time!);
+                        DateTimeOffset? dateTime = parseDateTime(date!, time!);
                         if (dateTime == null)
-                            InvalidFormatException.ThrowInvalidDateFormatException(date, time);
+                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time);
 
 
                         string? humidity = getCellValue(row, 3);
@@ -75,11 +72,22 @@ namespace WebWeatherApi.Domain.Services
                         WeatherDetails weatherDetails = WeatherDetails.parseAndCreate(0, dateTime!.Value, temperature, humidity, dewPoint, pressure, windDirection, windSpeed, cloudiness, cloudBase, visibility);
 
                         string? weatherRecordDetails = getCellValue(row, 11);
-
+                        WeatherRecord? weatherRecord = null;
                         if (weatherRecordDetails != null)
                         {
-                            WeatherRecord weatherRecord = new WeatherRecord(0, weatherRecordDetails);
+                            weatherRecord = _context!.WeatherRecords!.FirstOrDefault(wr => wr.Description == weatherRecordDetails);
+                            if (weatherRecord == null)
+                                weatherRecord = new WeatherRecord(0, weatherRecordDetails);
+
+                            var weatherRecordEntity = _context.WeatherRecords.Add(weatherRecord);
+
+                            weatherDetails.WeatherRecord = weatherRecordEntity.Entity;
+                            weatherDetails.WeatherRecordId = weatherRecordEntity.Entity.Id;
+
                         }
+
+                        _context.Add(weatherDetails);
+                        _context.SaveChanges();
 
                     }
                 }

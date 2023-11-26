@@ -11,7 +11,7 @@ namespace WebWeatherApi.Entities.Model
     {
 
 
-        public static WeatherDetails parseAndCreate(int id, DateTime date, string temperature, string? humidty, string? dewPoint, string? pressure, string? windDirection, string? windSpeed, string? cloudiness, string? cloudBase, string? visibility)
+        public static WeatherDetails parseAndCreate(int id, DateTimeOffset date, string temperature, string? humidty, string? dewPoint, string? pressure, string? windDirection, string? windSpeed, string? cloudiness, string? cloudBase, string? visibility)
         {
             return new WeatherDetails
             {
@@ -31,7 +31,7 @@ namespace WebWeatherApi.Entities.Model
 
         public int Id { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; }
 
         public string Temperature { get; set; }
 

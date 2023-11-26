@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebWeatherApi.Domain.Services;
 using WebWeatherApi.Entities.Model;
+using WebWeatherApi.Use_Cases.Exceptions;
 namespace WebApplication1.Controllers
 {
     [ApiController]
@@ -57,8 +58,15 @@ namespace WebApplication1.Controllers
             try
             {
 
+                try
+                {
+                    await _weatherRecordService.AddExcelRecord(file);
+                }
 
-                await _weatherRecordService.AddExcelRecord(file);
+                catch (InvalidExcelFormatException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
                 // You can add more processing logic here based on the Excel data.
 
                 return Ok("File uploaded and processed successfully");
