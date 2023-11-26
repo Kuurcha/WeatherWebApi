@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using WebWeatherApi.Domain.Services;
 using WebWeatherApi.Entities.Model;
 namespace WebApplication1.Controllers
@@ -47,6 +45,9 @@ namespace WebApplication1.Controllers
         [HttpPost("upload")]
         public async Task<ActionResult> UploadFile(IFormFile file)
         {
+
+            ICollection<WeatherDetails> weatherDetails = new List<WeatherDetails>();
+
             // Check if the request contains multipart/form-data.
             if (!Request.HasFormContentType || Request.Form.Files.Count == 0)
             {
@@ -56,32 +57,8 @@ namespace WebApplication1.Controllers
             try
             {
 
-                using (var stream = file.OpenReadStream())
-                {
-                    IWorkbook workbook = await Task.Run(() => new XSSFWorkbook(stream));
-                    ISheet sheet = workbook.GetSheetAt(0);
 
-
-                    for (int i = 0; i <= sheet.LastRowNum; i++)
-                    {
-                        IRow row = sheet.GetRow(i);
-                        if (row != null)
-                        {
-
-                            for (int j = 0; j < row.LastCellNum; j++)
-                            {
-                                ICell cell = row.GetCell(j);
-                                if (cell != null)
-                                {
-
-                                    string cellValue = cell.ToString();
-
-                                }
-                            }
-                        }
-                    }
-                }
-
+                await _weatherRecordService.AddExcelRecord(file);
                 // You can add more processing logic here based on the Excel data.
 
                 return Ok("File uploaded and processed successfully");

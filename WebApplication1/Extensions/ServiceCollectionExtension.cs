@@ -15,7 +15,11 @@ namespace WebWeatherApi.Extensions
         /// <param name="services"></param>
         public static void InjectServices(this IServiceCollection services)
         {
+            services.AddScoped<ContextService>();
+            services.AddScoped<ExcelParsingService>();
             services.AddScoped<WeatherRecordService>();
+
+
         }
         public static void ConfigureDBContext(this IServiceCollection services, string connectionString)
         {

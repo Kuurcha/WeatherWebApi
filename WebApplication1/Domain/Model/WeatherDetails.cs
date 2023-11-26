@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using WebWeatherApi.Entities.ModelConfiguration;
+using WebWeatherApi.Shared.Helper;
 
 namespace WebWeatherApi.Entities.Model
 {
@@ -8,6 +9,25 @@ namespace WebWeatherApi.Entities.Model
     [EntityTypeConfiguration(typeof(WeatherDetailsConfiguration))]
     public class WeatherDetails
     {
+
+
+        public static WeatherDetails parseAndCreate(int id, DateTime date, string temperature, string? humidty, string? dewPoint, string? pressure, string? windDirection, string? windSpeed, string? cloudiness, string? cloudBase, string? visibility)
+        {
+            return new WeatherDetails
+            {
+                Id = id,
+                Date = date,
+                Temperature = temperature,
+                Humidty = ParsingHelper.ParseNullableInt(humidty),
+                DewPoint = ParsingHelper.ParseNullableDouble(dewPoint),
+                Pressure = ParsingHelper.ParseNullableDouble(pressure),
+                WindDirection = windDirection,
+                WindSpeed = ParsingHelper.ParseNullableInt(windSpeed),
+                Cloudiness = ParsingHelper.ParseNullableInt(cloudiness),
+                CloudBase = ParsingHelper.ParseNullableInt(cloudBase),
+                Visibility = ParsingHelper.ParseNullableInt(visibility),
+            };
+        }
 
         public int Id { get; set; }
 

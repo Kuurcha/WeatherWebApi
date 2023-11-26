@@ -8,6 +8,12 @@ namespace WebWeatherApi.Entities.Model
     [EntityTypeConfiguration(typeof(WeatherRecordConfiguration))]
     public class WeatherRecord
     {
+        public WeatherRecord(int id, string description)
+        {
+            Id = id;
+            Description = description;
+        }
+
         public int Id { get; set; }
 
         public string Description { get; set; }

@@ -7,10 +7,18 @@ namespace WebWeatherApi.Domain.Services
     {
 
         private readonly ApplicationDbContext _context;
+        private readonly ExcelParsingService _excelParsingService;
 
-        public WeatherRecordService(ApplicationDbContext context)
+        public WeatherRecordService(ApplicationDbContext context, ExcelParsingService excelParsingService)
         {
             _context = context;
+            _excelParsingService = excelParsingService;
+        }
+
+        public async Task<int> AddExcelRecord(IFormFile file)
+        {
+            await _excelParsingService.ParseExcelToWeatherDetailsAndWeatherRecord(file);
+            return await _context.SaveChangesAsync();
         }
 
         public async Task<int> AddWeatherRecord(WeatherRecord weatherRecord)
