@@ -44,10 +44,10 @@ namespace WebApplication1.Controllers
 
 
         [HttpPost("upload")]
-        public async Task<ActionResult> UploadFile(IFormFile file)
+        public async Task<ActionResult> UploadFile(IFormFileCollection files)
         {
 
-            ICollection<WeatherDetails> weatherDetails = new List<WeatherDetails>();
+            string statusMessages = "";
 
             // Check if the request contains multipart/form-data.
             if (!Request.HasFormContentType || Request.Form.Files.Count == 0)
@@ -57,23 +57,26 @@ namespace WebApplication1.Controllers
 
             try
             {
-
-                try
+                foreach (var file in files)
                 {
-                    await _weatherRecordService.AddExcelRecord(file);
+                    try
+                    {
+                        await _weatherRecordService.AddExcelRecord(file);
+                    }
+
+                    catch (InvalidExcelFormatException ex)
+                    {
+                        return BadRequest(statusMessages + ex.Message);
+                    }
+                    statusMessages += "File " + file.FileName + " uploaded and processed successfully\n";
                 }
 
-                catch (InvalidExcelFormatException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-                // You can add more processing logic here based on the Excel data.
 
-                return Ok("File uploaded and processed successfully");
+                return Ok(statusMessages);
             }
             catch (Exception e)
             {
-                return StatusCode(500, $"Internal server error: {e.Message}");
+                return StatusCode(500, statusMessages + $"Internal server error: {e.Message}");
             }
         }
     }

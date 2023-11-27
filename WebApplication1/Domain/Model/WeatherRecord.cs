@@ -18,6 +18,6 @@ namespace WebWeatherApi.Entities.Model
 
         public string Description { get; set; }
 
-        public ICollection<WeatherDetails> WeatherRecords { get; set; }
+        public ICollection<WeatherDetails> WeatherDetails { get; set; }
     }
 }

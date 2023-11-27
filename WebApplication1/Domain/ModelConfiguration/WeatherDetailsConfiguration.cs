@@ -12,7 +12,7 @@ namespace WebWeatherApi.Entities.ModelConfiguration
             builder.Property(wd => wd.Id).ValueGeneratedOnAdd();
 
             builder.HasOne(wd => wd.WeatherRecord).
-                 WithMany(wr => wr.WeatherRecords)
+                 WithMany(wr => wr.WeatherDetails)
                  .HasForeignKey(wr => wr.WeatherRecordId);
 
             builder.Property(wd => wd.Date).IsRequired();

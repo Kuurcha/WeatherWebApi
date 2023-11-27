@@ -32,6 +32,7 @@ namespace WebWeatherApi.Domain.Services
         }
         public async Task<int> ParseExcelToWeatherDetailsAndWeatherRecord(IFormFile file)
         {
+
             using (var stream = file.OpenReadStream())
             {
                 IWorkbook workbook = await Task.Run(() => new XSSFWorkbook(stream));
@@ -47,17 +48,19 @@ namespace WebWeatherApi.Domain.Services
                         string? date = getCellValue(row, 0);
                         string? time = getCellValue(row, 1);
 
+                        string filename = file.FileName;
+
                         if (date == null || time == null)
-                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time);
+                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time, filename);
 
                         string? temperature = getCellValue(row, 2);
 
                         if (temperature == null)
-                            throw new InvalidExcelFormatException("Temperature for the record should be specified");
+                            throw new InvalidExcelFormatException("File + " + filename + "can't be parsed." + "Temperature for the record should be specified");
 
                         DateTimeOffset? dateTime = parseDateTime(date!, time!);
                         if (dateTime == null)
-                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time);
+                            InvalidExcelFormatException.ThrowInvalidDateFormatException(date, time, filename);
 
 
                         string? humidity = getCellValue(row, 3);
@@ -72,23 +75,22 @@ namespace WebWeatherApi.Domain.Services
                         WeatherDetails weatherDetails = WeatherDetails.parseAndCreate(0, dateTime!.Value, temperature, humidity, dewPoint, pressure, windDirection, windSpeed, cloudiness, cloudBase, visibility);
 
                         string? weatherRecordDetails = getCellValue(row, 11);
-                        WeatherRecord? weatherRecord = null;
+
                         if (weatherRecordDetails != null)
                         {
-                            weatherRecord = _context!.WeatherRecords!.FirstOrDefault(wr => wr.Description == weatherRecordDetails);
+                            WeatherRecord? weatherRecord = _context!.WeatherRecords!.FirstOrDefault(wr =>
+                               wr.Description == weatherRecordDetails
+                            );
                             if (weatherRecord == null)
+                            {
                                 weatherRecord = new WeatherRecord(0, weatherRecordDetails);
+                                weatherRecord = _context.WeatherRecords.Add(weatherRecord).Entity;
+                            }
 
-                            var weatherRecordEntity = _context.WeatherRecords.Add(weatherRecord);
-
-                            weatherDetails.WeatherRecord = weatherRecordEntity.Entity;
-                            weatherDetails.WeatherRecordId = weatherRecordEntity.Entity.Id;
-
+                            weatherDetails.WeatherRecord = weatherRecord;
                         }
-
-                        _context.Add(weatherDetails);
-                        _context.SaveChanges();
-
+                        _context.WeatherDetails.Add(weatherDetails);
+                        await _context.SaveChangesAsync();
                     }
                 }
             }
