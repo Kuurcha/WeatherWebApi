@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using WebWeatherApi.Entities.Model;
 using WebWeatherApi.Entities.ModelConfiguration;
+using WebWeatherApi.Interface_Adapters.DTO;
 
 namespace WebWeatherApi.Domain.Services
 {
@@ -9,10 +11,13 @@ namespace WebWeatherApi.Domain.Services
 
         private readonly ApplicationDbContext _context;
         private readonly ExcelParsingService _excelParsingService;
-        public WeatherRecordService(ApplicationDbContext context, ExcelParsingService excelParsingService)
+        private readonly IMapper _mapper;
+
+        public WeatherRecordService(ApplicationDbContext context, ExcelParsingService excelParsingService, IMapper mapper)
         {
             _context = context;
             _excelParsingService = excelParsingService;
+            _mapper = mapper;
         }
 
         public async Task<int> AddExcelRecord(IFormFile file)
@@ -22,9 +27,21 @@ namespace WebWeatherApi.Domain.Services
             return await _context.SaveChangesAsync();
         }
 
-        public List<WeatherRecord> GetAllRecords()
+        public async Task<List<WeatherRecordDTO>> GetAllRecordsAsync()
         {
-            return _context.WeatherRecords.Include(w => w.WeatherRecordDetails).ToList();
+            var records = await _context.WeatherRecords.Include(w => w.WeatherRecordDetails).ToListAsync();
+            return _mapper.Map<List<WeatherRecordDTO>>(records);
+        }
+
+        public async Task<List<WeatherRecordDTO>> GetWeatherRecordsAsync(int offset, int limit)
+        {
+            var records = await _context.WeatherRecords
+                .Include(w => w.WeatherRecordDetails)
+                .OrderBy(w => w.Id)
+                .Skip(offset)
+                .Take(limit)
+                .ToListAsync();
+            return _mapper.Map<List<WeatherRecordDTO>>(records);
         }
 
         public async Task<int> AddWeatherRecord(WeatherRecordDetails weatherRecord)
@@ -43,15 +60,7 @@ namespace WebWeatherApi.Domain.Services
                 .Where(w => w.Date.Year == year)
                 .ToList();
         }
-        public async Task<List<WeatherRecord>> GetWeatherDetails(int offset, int limit)
-        {
-            return await _context.WeatherRecords
-                .Include(w => w.WeatherRecordDetails)
-                .OrderBy(w => w.Id)
-                .Skip(offset)
-                .Take(limit)
-                .ToListAsync();
-        }
+
         public List<WeatherRecord> GetRecordsByMonthWithWeatherRecord(int year, int month)
         {
             return _context.WeatherRecords

@@ -20,4 +20,4 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - E:\Work\Data:/var/opt/mssql/data
+      - E:\Work\Data\db:/var/lib/postgresql/data

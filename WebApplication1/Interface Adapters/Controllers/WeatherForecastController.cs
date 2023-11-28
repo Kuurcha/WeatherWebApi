@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WebWeatherApi.Domain.Services;
+using WebWeatherApi.Interface_Adapters.DTO;
 namespace WebApplication1.Controllers
 {
     [ApiController]
@@ -11,21 +13,22 @@ namespace WebApplication1.Controllers
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly WeatherRecordService _weatherRecordService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, WeatherRecordService weatherRecordService)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, WeatherRecordService weatherRecordService, IMapper mapper)
         {
             _weatherRecordService = weatherRecordService;
             _logger = logger;
+
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> GetWeatherDetails(int offset, int limit)
+        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherDetails(int offset, int limit)
         {
             Response.Headers.Add("Content-Type", "application/json");
             try
             {
-                var weatherDetails = await _weatherRecordService.GetWeatherDetails(offset, limit);
-                return Ok(weatherDetails);
+                var records = await _weatherRecordService.GetWeatherRecordsAsync(offset, limit);
+                return Ok(records);
             }
             catch (Exception ex)
             {
