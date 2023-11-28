@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using WebWeatherApi.Domain.Services;
-using WebWeatherApi.Entities.Model;
-using WebWeatherApi.Use_Cases.Exceptions;
 namespace WebApplication1.Controllers
 {
     [ApiController]
@@ -9,10 +7,6 @@ namespace WebApplication1.Controllers
     public class WeatherForecastController : ControllerBase
 
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly WeatherRecordService _weatherRecordService;
@@ -23,36 +17,32 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
 
-        [HttpPost(Name = "PostWeatherRecord")]
-        public async Task<ActionResult> AddWeatherRecord(WeatherRecord record)
+        [HttpGet]
+        public async Task<IActionResult> GetWeatherDetails(int offset, int limit)
         {
-            await _weatherRecordService.AddWeatherRecord(record);
-            return Accepted();
+            Response.Headers.Add("Content-Type", "application/json");
+            try
+            {
+                var weatherDetails = await _weatherRecordService.GetWeatherDetails(offset, limit);
+                return Ok(weatherDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
         }
 
 
         [HttpPost("upload")]
         public async Task<ActionResult> UploadFile(IFormFileCollection files)
         {
-
             string statusMessages = "";
-
+            Response.Headers.Add("Content-Type", "application/json");
             // Check if the request contains multipart/form-data.
-            if (!Request.HasFormContentType || Request.Form.Files.Count == 0)
+            if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || files == null || files.Count == 0)
             {
-                return BadRequest("No file uploaded");
+                return BadRequest(new { message = "No file uploaded" });
             }
 
             try
@@ -63,20 +53,20 @@ namespace WebApplication1.Controllers
                     {
                         await _weatherRecordService.AddExcelRecord(file);
                     }
-
-                    catch (InvalidExcelFormatException ex)
+                    catch (Exception ex)
                     {
-                        return BadRequest(statusMessages + ex.Message);
+                        return BadRequest(new { message = statusMessages + ex.Message });
                     }
+
                     statusMessages += "File " + file.FileName + " uploaded and processed successfully\n";
                 }
 
 
-                return Ok(statusMessages);
+                return Ok(new { message = statusMessages });
             }
             catch (Exception e)
             {
-                return StatusCode(500, statusMessages + $"Internal server error: {e.Message}");
+                return StatusCode(500, new { message = statusMessages + $"Internal server error: {e.Message}" });
             }
         }
     }

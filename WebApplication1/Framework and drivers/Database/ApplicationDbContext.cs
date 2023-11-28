@@ -11,9 +11,9 @@ namespace WebWeatherApi.Entities.ModelConfiguration
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public DbSet<WeatherDetails> WeatherDetails { get; set; }
-
         public DbSet<WeatherRecord> WeatherRecords { get; set; }
+
+        public DbSet<WeatherRecordDetails> WeatherRecordDetails { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

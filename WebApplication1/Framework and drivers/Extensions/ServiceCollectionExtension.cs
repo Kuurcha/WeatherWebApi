@@ -15,11 +15,19 @@ namespace WebWeatherApi.Extensions
         /// <param name="services"></param>
         public static void InjectServices(this IServiceCollection services)
         {
-            services.AddScoped<ContextService>();
-            services.AddScoped<ExcelParsingService>();
+            services.AddScoped<ExcelParsingService>(); string statusMessages = "";
             services.AddScoped<WeatherRecordService>();
+        }
 
-
+        public static void AddCorsAny(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin",
+                    builder => builder.WithOrigins("http://localhost:4200")
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod());
+            });
         }
         public static void ConfigureDBContext(this IServiceCollection services, string connectionString)
         {

@@ -9,6 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureDBContext(builder.Configuration.GetConnectionString("Dockerized"));
 builder.Services.InjectServices();
+builder.Services.AddCorsAny();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -18,10 +19,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowOrigin");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();

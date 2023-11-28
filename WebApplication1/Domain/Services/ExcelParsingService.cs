@@ -35,7 +35,7 @@ namespace WebWeatherApi.Domain.Services
 
             using (var stream = file.OpenReadStream())
             {
-                IWorkbook workbook = await Task.Run(() => new XSSFWorkbook(stream));
+                IWorkbook workbook = new XSSFWorkbook(stream);
                 ISheet sheet = workbook.GetSheetAt(0);
 
 
@@ -72,24 +72,24 @@ namespace WebWeatherApi.Domain.Services
                         string? cloudBase = getCellValue(row, 9);
                         string? visibility = getCellValue(row, 10);
 
-                        WeatherDetails weatherDetails = WeatherDetails.parseAndCreate(0, dateTime!.Value, temperature, humidity, dewPoint, pressure, windDirection, windSpeed, cloudiness, cloudBase, visibility);
+                        WeatherRecord weatherRecord = WeatherRecord.parseAndCreate(0, dateTime!.Value, temperature, humidity, dewPoint, pressure, windDirection, windSpeed, cloudiness, cloudBase, visibility);
 
-                        string? weatherRecordDetails = getCellValue(row, 11);
+                        string? weatherRecordDetailsDescription = getCellValue(row, 11);
 
-                        if (weatherRecordDetails != null)
+                        if (weatherRecordDetailsDescription != null)
                         {
-                            WeatherRecord? weatherRecord = _context!.WeatherRecords!.FirstOrDefault(wr =>
-                               wr.Description == weatherRecordDetails
+                            WeatherRecordDetails? weatherRecordDetails = _context!.WeatherRecordDetails!.FirstOrDefault(wr =>
+                               wr.Description == weatherRecordDetailsDescription
                             );
-                            if (weatherRecord == null)
+                            if (weatherRecordDetails == null)
                             {
-                                weatherRecord = new WeatherRecord(0, weatherRecordDetails);
-                                weatherRecord = _context.WeatherRecords.Add(weatherRecord).Entity;
+                                weatherRecordDetails = new WeatherRecordDetails(0, weatherRecordDetailsDescription);
+                                weatherRecordDetails = _context.WeatherRecordDetails.Add(weatherRecordDetails).Entity;
                             }
 
-                            weatherDetails.WeatherRecord = weatherRecord;
+                            weatherRecord.WeatherRecordDetails = weatherRecordDetails;
                         }
-                        _context.WeatherDetails.Add(weatherDetails);
+                        _context.WeatherRecords.Add(weatherRecord);
                         await _context.SaveChangesAsync();
                     }
                 }
