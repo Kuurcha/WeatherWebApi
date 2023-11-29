@@ -38,38 +38,30 @@ namespace WebApplication1.Controllers
 
 
         [HttpPost("upload")]
-        public async Task<ActionResult> UploadFile(IFormFileCollection files)
+        public async Task<ActionResult> UploadFile(IFormFile file)
         {
             string statusMessages = "";
             Response.Headers.Add("Content-Type", "application/json");
             // Check if the request contains multipart/form-data.
-            if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || files == null || files.Count == 0)
+            if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || file == null)
             {
                 return BadRequest(new { message = "No file uploaded" });
             }
-
             try
             {
-                foreach (var file in files)
+                try
                 {
-                    try
-                    {
-                        await _weatherRecordService.AddExcelRecord(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        return BadRequest(new { message = statusMessages + ex.Message });
-                    }
-
-                    statusMessages += "File " + file.FileName + " uploaded and processed successfully\n";
+                    await _weatherRecordService.AddExcelRecord(file);
                 }
-
-
-                return Ok(new { message = statusMessages });
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = statusMessages + ex.Message });
+                }
+                return Ok(new { message = "File " + file.FileName + " uploaded and processed successfully\n" });
             }
             catch (Exception e)
             {
-                return StatusCode(500, new { message = statusMessages + $"Internal server error: {e.Message}" });
+                return StatusCode(500, new { message = $"Internal server error: {e.Message}" });
             }
         }
     }
