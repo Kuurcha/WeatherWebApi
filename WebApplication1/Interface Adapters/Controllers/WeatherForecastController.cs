@@ -53,6 +53,10 @@ namespace WebApplication1.Controllers
                 {
                     await _weatherRecordService.AddExcelRecord(file);
                 }
+                catch (ICSharpCode.SharpZipLib.Zip.ZipException zipException)
+                {
+                    return BadRequest(new { message = "File " + file.FileName + " has unsupported file format or is corrupted." });
+                }
                 catch (Exception ex)
                 {
                     return BadRequest(new { message = statusMessages + ex.Message });
