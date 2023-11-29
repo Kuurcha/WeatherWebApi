@@ -42,7 +42,7 @@ namespace WebApplication1.Controllers
         {
             string statusMessages = "";
             Response.Headers.Add("Content-Type", "application/json");
-            // Check if the request contains multipart/form-data.
+
             if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || file == null)
             {
                 return BadRequest(new { message = "No file uploaded" });
