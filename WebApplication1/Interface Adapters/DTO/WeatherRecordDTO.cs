@@ -2,6 +2,7 @@
 {
     public class WeatherRecordDTO
     {
+        public int Id { get; set; }
         public DateTimeOffset Date { get; set; }
         public string Temperature { get; set; }
         public int? Humidity { get; set; }

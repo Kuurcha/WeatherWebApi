@@ -36,6 +36,21 @@ namespace WebApplication1.Controllers
             }
         }
 
+        [HttpGet("biggerThanId")]
+        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherDetailsBiggerThanLastId(int lastId, int limit)
+        {
+            Response.Headers.Add("Content-Type", "application/json");
+            try
+            {
+                var records = await _weatherRecordService.GetWeatherRecordsBiggerThanIdAsync(lastId, limit);
+                return Ok(new { message = "Successfully returned records", content = records });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
+
         [HttpGet("total")]
         public async Task<ActionResult<int>> GetTotalWeatherRecords()
         {

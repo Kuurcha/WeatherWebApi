@@ -56,6 +56,18 @@ namespace WebWeatherApi.Domain.Services
             return _mapper.Map<List<WeatherRecordDTO>>(records);
         }
 
+        public async Task<List<WeatherRecordDTO>> GetWeatherRecordsBiggerThanIdAsync(int lastId, int limit)
+        {
+            var records = await _context.WeatherRecords
+                .Include(w => w.WeatherRecordDetails)
+                .Where(w => w.Id > lastId)
+                .OrderBy(w => w.Id)
+                .Take(limit)
+                .ToListAsync();
+
+            return _mapper.Map<List<WeatherRecordDTO>>(records);
+        }
+
         public async Task<int> AddWeatherRecord(WeatherRecordDetails weatherRecord)
         {
             if (weatherRecord != null)

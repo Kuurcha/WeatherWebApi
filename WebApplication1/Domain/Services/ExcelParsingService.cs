@@ -91,6 +91,7 @@ namespace WebWeatherApi.Domain.Services
 
                                 weatherRecord.WeatherRecordDetails = weatherRecordDetails;
                             }
+                            weatherRecordsBatch.Add(weatherRecord);
                             if (weatherRecordsBatch.Count % batchSize == 0) // Adjust the batch size as needed
                             {
                                 _context.WeatherRecords.AddRange(weatherRecordsBatch);
