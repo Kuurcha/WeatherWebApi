@@ -51,6 +51,37 @@ namespace WebApplication1.Controllers
 
         }
 
+        [HttpPost("upload/batch")]
+        public async Task<ActionResult> UploadFileBatch(IFormFile file)
+        {
+            string statusMessages = "";
+            Response.Headers.Add("Content-Type", "application/json");
+
+            if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || file == null)
+            {
+                return BadRequest(new { message = "No file uploaded" });
+            }
+            try
+            {
+                try
+                {
+                    await _weatherRecordService.AddExcelRecordBatch(file);
+                }
+                catch (ICSharpCode.SharpZipLib.Zip.ZipException zipException)
+                {
+                    return BadRequest(new { message = "File " + file.FileName + " has unsupported file format or is corrupted." });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = statusMessages + ex.Message });
+                }
+                return Ok(new { message = "File " + file.FileName + " uploaded and processed successfully\n" });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {e.Message}" });
+            }
+        }
         [HttpPost("upload")]
         public async Task<ActionResult> UploadFile(IFormFile file)
         {

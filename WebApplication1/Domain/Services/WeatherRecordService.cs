@@ -27,6 +27,13 @@ namespace WebWeatherApi.Domain.Services
             return await _context.SaveChangesAsync();
         }
 
+        public async Task<int> AddExcelRecordBatch(IFormFile file)
+        {
+
+            await _excelParsingService.ParseExcelToWeatherDetailsAndWeatherRecordInBatches(file);
+            return await _context.SaveChangesAsync();
+        }
+
         public async Task<List<WeatherRecordDTO>> GetAllRecordsAsync()
         {
             var records = await _context.WeatherRecords.Include(w => w.WeatherRecordDetails).ToListAsync();
