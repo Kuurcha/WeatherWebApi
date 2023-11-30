@@ -28,7 +28,7 @@ namespace WebApplication1.Controllers
             try
             {
                 var records = await _weatherRecordService.GetWeatherRecordsAsync(offset, limit);
-                return Ok(records);
+                return Ok(new { message = "Sucessfully returned " + records, content = records });
             }
             catch (Exception ex)
             {
@@ -36,6 +36,20 @@ namespace WebApplication1.Controllers
             }
         }
 
+        [HttpGet("total")]
+        public async Task<ActionResult<int>> GetTotalWeatherRecords()
+        {
+            try
+            {
+                int totalRecords = await _weatherRecordService.CountAllRecords();
+                return Ok(new { message = "Sucessfully returned " + totalRecords, content = totalRecords });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+
+        }
 
         [HttpPost("upload")]
         public async Task<ActionResult> UploadFile(IFormFile file)

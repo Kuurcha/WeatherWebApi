@@ -33,6 +33,11 @@ namespace WebWeatherApi.Domain.Services
             return _mapper.Map<List<WeatherRecordDTO>>(records);
         }
 
+        public async Task<int> CountAllRecords()
+        {
+            return await _context.WeatherRecords.CountAsync();
+        }
+
         public async Task<List<WeatherRecordDTO>> GetWeatherRecordsAsync(int offset, int limit)
         {
             var records = await _context.WeatherRecords
