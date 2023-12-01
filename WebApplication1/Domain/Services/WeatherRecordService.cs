@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using WebWeatherApi.Entities.Model;
 using WebWeatherApi.Entities.ModelConfiguration;
 using WebWeatherApi.Interface_Adapters.DTO;
 
@@ -18,13 +17,6 @@ namespace WebWeatherApi.Domain.Services
             _context = context;
             _excelParsingService = excelParsingService;
             _mapper = mapper;
-        }
-
-        public async Task<int> AddExcelRecord(IFormFile file)
-        {
-
-            await _excelParsingService.ParseExcelToWeatherDetailsAndWeatherRecord(file);
-            return await _context.SaveChangesAsync();
         }
 
         public async Task<int> AddExcelRecordBatch(IFormFile file)
@@ -48,6 +40,7 @@ namespace WebWeatherApi.Domain.Services
         public async Task<int> CountRecordsInDateRange(DateTime startDate, DateTime endDate)
         {
             return await _context.WeatherRecords
+                .AsNoTracking()
                 .Where(w => w.Date >= startDate && w.Date <= endDate)
                 .CountAsync();
         }
@@ -56,6 +49,7 @@ namespace WebWeatherApi.Domain.Services
         {
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
+                .AsNoTracking()
                 .OrderBy(w => w.Id)
                 .Skip(offset)
                 .Take(limit)
@@ -67,6 +61,7 @@ namespace WebWeatherApi.Domain.Services
         {
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
+                .AsNoTracking()
                 .Where(w => w.Id > lastId)
                 .OrderBy(w => w.Date)
                 .Take(limit)
@@ -79,37 +74,13 @@ namespace WebWeatherApi.Domain.Services
         {
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
+                .AsNoTracking()
                 .Where(w => w.Id > lastId && w.Date >= startDate && w.Date <= endDate)
                 .OrderBy(w => w.Date)
                 .Take(limit)
                 .ToListAsync();
 
             return _mapper.Map<List<WeatherRecordDTO>>(records);
-        }
-
-        public async Task<int> AddWeatherRecord(WeatherRecordDetails weatherRecord)
-        {
-            if (weatherRecord != null)
-            {
-                _context.WeatherRecordDetails.Add(weatherRecord);
-            }
-            return await _context.SaveChangesAsync();
-        }
-
-        public List<WeatherRecord> GetRecordsByYear(int year)
-        {
-            return _context.WeatherRecords
-                .Include(w => w.WeatherRecordDetails)
-                .Where(w => w.Date.Year == year)
-                .ToList();
-        }
-
-        public List<WeatherRecord> GetRecordsByMonthWithWeatherRecord(int year, int month)
-        {
-            return _context.WeatherRecords
-                .Include(w => w.WeatherRecordDetails)
-                .Where(w => w.Date.Year == year && w.Date.Month == month)
-                .ToList();
         }
     }
 }
