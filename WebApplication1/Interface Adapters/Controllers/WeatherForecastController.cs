@@ -50,6 +50,20 @@ namespace WebApplication1.Controllers
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpGet("inDateRange")]
+        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherRecordsInDateRange(int lastId, int limit, DateTime startDate, DateTime endDate)
+        {
+            Response.Headers.Add("Content-Type", "application/json");
+            try
+            {
+                var records = await _weatherRecordService.GetWeatherRecordsBiggerThanIdInDateRangeAsync(lastId, limit, startDate, endDate);
+                return Ok(new { message = "Successfully returned records within date range", content = records });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
+        }
 
         [HttpGet("total")]
         public async Task<ActionResult<int>> GetTotalWeatherRecords()
@@ -64,6 +78,20 @@ namespace WebApplication1.Controllers
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
 
+        }
+
+        [HttpGet("totalInDateRange")]
+        public async Task<ActionResult<int>> getTotalWeatherRecordsInDateRange(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                int count = await _weatherRecordService.CountRecordsInDateRange(startDate, endDate);
+                return Ok(new { message = $"Successfully returned count for records within date range", content = count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+            }
         }
 
         [HttpPost("upload/batch")]

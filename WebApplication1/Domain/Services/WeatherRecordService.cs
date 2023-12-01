@@ -45,6 +45,13 @@ namespace WebWeatherApi.Domain.Services
             return await _context.WeatherRecords.CountAsync();
         }
 
+        public async Task<int> CountRecordsInDateRange(DateTime startDate, DateTime endDate)
+        {
+            return await _context.WeatherRecords
+                .Where(w => w.Date >= startDate && w.Date <= endDate)
+                .CountAsync();
+        }
+
         public async Task<List<WeatherRecordDTO>> GetWeatherRecordsAsync(int offset, int limit)
         {
             var records = await _context.WeatherRecords
@@ -61,6 +68,18 @@ namespace WebWeatherApi.Domain.Services
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
                 .Where(w => w.Id > lastId)
+                .OrderBy(w => w.Id)
+                .Take(limit)
+                .ToListAsync();
+
+            return _mapper.Map<List<WeatherRecordDTO>>(records);
+        }
+
+        public async Task<List<WeatherRecordDTO>> GetWeatherRecordsBiggerThanIdInDateRangeAsync(int lastId, int limit, DateTime startDate, DateTime endDate)
+        {
+            var records = await _context.WeatherRecords
+                .Include(w => w.WeatherRecordDetails)
+                .Where(w => w.Id > lastId && w.Date >= startDate && w.Date <= endDate)
                 .OrderBy(w => w.Id)
                 .Take(limit)
                 .ToListAsync();
