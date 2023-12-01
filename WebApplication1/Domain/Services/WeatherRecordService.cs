@@ -68,7 +68,7 @@ namespace WebWeatherApi.Domain.Services
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
                 .Where(w => w.Id > lastId)
-                .OrderBy(w => w.Id)
+                .OrderBy(w => w.Date)
                 .Take(limit)
                 .ToListAsync();
 
@@ -80,7 +80,7 @@ namespace WebWeatherApi.Domain.Services
             var records = await _context.WeatherRecords
                 .Include(w => w.WeatherRecordDetails)
                 .Where(w => w.Id > lastId && w.Date >= startDate && w.Date <= endDate)
-                .OrderBy(w => w.Id)
+                .OrderBy(w => w.Date)
                 .Take(limit)
                 .ToListAsync();
 

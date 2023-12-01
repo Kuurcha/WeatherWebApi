@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebWeatherApi.Entities.Model;
-using WebWeatherApi.Entities.Model.Authentication;
+
 
 namespace WebWeatherApi.Entities.ModelConfiguration
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public DbSet<WeatherRecord> WeatherRecords { get; set; }
 
