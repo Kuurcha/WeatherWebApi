@@ -20,78 +20,64 @@ namespace WebApplication1.Controllers
 
         }
 
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherDetails(int offset, int limit)
+        private async Task<ActionResult<T>> HandleWeatherRecordsAsync<T>(Func<Task<T>> getRecordsFunc, string successMessage)
         {
             Response.Headers.Add("Content-Type", "application/json");
+
             try
             {
-                var records = await _weatherRecordService.GetWeatherRecordsAsync(offset, limit);
-                return Ok(new { message = "Sucessfully returned " + records, content = records });
+                var records = await getRecordsFunc.Invoke();
+                return Ok(new { message = successMessage, content = records });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherDetails(int offset, int limit)
+        {
+            return await HandleWeatherRecordsAsync(
+                async () => await _weatherRecordService.GetWeatherRecordsAsync(offset, limit),
+                "Successfully returned records"
+            );
         }
 
         [HttpGet("biggerThanId")]
-        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherDetailsBiggerThanLastId(int lastId, int limit)
+        public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherDetailsBiggerThanLastId(int lastId, int limit)
         {
-            Response.Headers.Add("Content-Type", "application/json");
-            try
-            {
-                var records = await _weatherRecordService.GetWeatherRecordsBiggerThanIdAsync(lastId, limit);
-                return Ok(new { message = "Successfully returned records", content = records });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
-            }
+            return await HandleWeatherRecordsAsync(
+                async () => await _weatherRecordService.GetWeatherRecordsBiggerThanIdAsync(lastId, limit),
+                "Successfully returned records"
+            );
         }
+
         [HttpGet("inDateRange")]
-        public async Task<ActionResult<IEnumerable<WeatherRecordDTO>>> GetWeatherRecordsInDateRange(int lastId, int limit, DateTime startDate, DateTime endDate)
+        public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherRecordsInDateRange(int lastId, int limit, DateTime startDate, DateTime endDate)
         {
-            Response.Headers.Add("Content-Type", "application/json");
-            try
-            {
-                var records = await _weatherRecordService.GetWeatherRecordsBiggerThanIdInDateRangeAsync(lastId, limit, startDate, endDate);
-                return Ok(new { message = "Successfully returned records within date range", content = records });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
-            }
+            return await HandleWeatherRecordsAsync(
+                async () => await _weatherRecordService.GetWeatherRecordsBiggerThanIdInDateRangeAsync(lastId, limit, startDate, endDate),
+                "Successfully returned records within date range"
+            );
         }
 
         [HttpGet("total")]
         public async Task<ActionResult<int>> GetTotalWeatherRecords()
         {
-            try
-            {
-                int totalRecords = await _weatherRecordService.CountAllRecords();
-                return Ok(new { message = "Sucessfully returned " + totalRecords, content = totalRecords });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
-            }
-
+            return await HandleWeatherRecordsAsync(
+                async () => await _weatherRecordService.CountAllRecords(),
+                "Successfully returned record count"
+            );
         }
 
         [HttpGet("totalInDateRange")]
         public async Task<ActionResult<int>> getTotalWeatherRecordsInDateRange(DateTime startDate, DateTime endDate)
         {
-            try
-            {
-                int count = await _weatherRecordService.CountRecordsInDateRange(startDate, endDate);
-                return Ok(new { message = $"Successfully returned count for records within date range", content = count });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
-            }
+            return await HandleWeatherRecordsAsync(
+                async () => await _weatherRecordService.CountRecordsInDateRange(startDate, endDate),
+                "Successfully returned count for records within date range"
+           );
         }
 
         [HttpPost("upload/batch")]
@@ -109,37 +95,6 @@ namespace WebApplication1.Controllers
                 try
                 {
                     await _weatherRecordService.AddExcelRecordBatch(file);
-                }
-                catch (ICSharpCode.SharpZipLib.Zip.ZipException zipException)
-                {
-                    return BadRequest(new { message = "File " + file.FileName + " has unsupported file format or is corrupted." });
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = statusMessages + ex.Message });
-                }
-                return Ok(new { message = "File " + file.FileName + " uploaded and processed successfully\n" });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new { message = $"Internal server error: {e.Message}" });
-            }
-        }
-        [HttpPost("upload")]
-        public async Task<ActionResult> UploadFile(IFormFile file)
-        {
-            string statusMessages = "";
-            Response.Headers.Add("Content-Type", "application/json");
-
-            if (!Request.HasFormContentType || Request.Form.Files.Count == 0 || file == null)
-            {
-                return BadRequest(new { message = "No file uploaded" });
-            }
-            try
-            {
-                try
-                {
-                    await _weatherRecordService.AddExcelRecord(file);
                 }
                 catch (ICSharpCode.SharpZipLib.Zip.ZipException zipException)
                 {
