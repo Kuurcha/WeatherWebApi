@@ -7,12 +7,6 @@ namespace WebWeatherApi.Extensions
     public static class ServiceCollectionExtension
     {
 
-
-
-        /// <summary>
-        /// Injects user created services into the program
-        /// </summary>
-        /// <param name="services"></param>
         public static void InjectServices(this IServiceCollection services)
         {
             services.AddScoped<ExcelParsingService>(); string statusMessages = "";

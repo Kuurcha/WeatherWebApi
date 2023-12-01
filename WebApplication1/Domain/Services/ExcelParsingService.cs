@@ -92,7 +92,7 @@ namespace WebWeatherApi.Domain.Services
                                 weatherRecord.WeatherRecordDetails = weatherRecordDetails;
                             }
                             weatherRecordsBatch.Add(weatherRecord);
-                            if (weatherRecordsBatch.Count % batchSize == 0) // Adjust the batch size as needed
+                            if (weatherRecordsBatch.Count % batchSize == 0)
                             {
                                 _context.WeatherRecords.AddRange(weatherRecordsBatch);
                                 await _context.SaveChangesAsync();
