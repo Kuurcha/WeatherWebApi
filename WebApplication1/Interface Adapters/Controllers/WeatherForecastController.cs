@@ -1,6 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WebWeatherApi.Domain.Services;
+using WebWeatherApi.Domain.Services.Implementation;
 using WebWeatherApi.Interface_Adapters.DTO;
 namespace WebApplication1.Controllers
 {

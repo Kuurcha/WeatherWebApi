@@ -1,13 +1,14 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Globalization;
+using WebWeatherApi.Domain.Services.Interfaces;
 using WebWeatherApi.Entities.Model;
 using WebWeatherApi.Entities.ModelConfiguration;
 using WebWeatherApi.Use_Cases.Exceptions;
 
-namespace WebWeatherApi.Domain.Services
+namespace WebWeatherApi.Domain.Services.Implementation
 {
-    public class ExcelParsingService
+    public class ExcelParsingService : IExcelParsingService
     {
         private readonly int amountOfRows = 11;
 

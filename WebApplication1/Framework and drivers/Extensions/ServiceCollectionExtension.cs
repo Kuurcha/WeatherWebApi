@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebWeatherApi.Domain.Services;
+using WebWeatherApi.Domain.Services.Implementation;
+using WebWeatherApi.Domain.Services.Interfaces;
 using WebWeatherApi.Entities.ModelConfiguration;
 
 namespace WebWeatherApi.Extensions
@@ -9,7 +10,7 @@ namespace WebWeatherApi.Extensions
 
         public static void InjectServices(this IServiceCollection services)
         {
-            services.AddScoped<ExcelParsingService>(); string statusMessages = "";
+            services.AddScoped<IExcelParsingService, ExcelParsingService>();
             services.AddScoped<WeatherRecordService>();
         }
 

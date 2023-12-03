@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using WebWeatherApi.Domain.Services.Interfaces;
 using WebWeatherApi.Entities.ModelConfiguration;
 using WebWeatherApi.Interface_Adapters.DTO;
 
-namespace WebWeatherApi.Domain.Services
+namespace WebWeatherApi.Domain.Services.Implementation
 {
     public class WeatherRecordService
     {
 
         private readonly ApplicationDbContext _context;
-        private readonly ExcelParsingService _excelParsingService;
+        private readonly IExcelParsingService _excelParsingService;
         private readonly IMapper _mapper;
 
-        public WeatherRecordService(ApplicationDbContext context, ExcelParsingService excelParsingService, IMapper mapper)
+        public WeatherRecordService(ApplicationDbContext context, IExcelParsingService excelParsingService, IMapper mapper)
         {
             _context = context;
             _excelParsingService = excelParsingService;
