@@ -12,13 +12,18 @@ builder.Services.ConfigureDBContext(builder.Configuration.GetConnectionString("D
 builder.Services.InjectServices();
 builder.Services.AddCorsAny();
 builder.Services.AddAutoMapper(typeof(WeatherMappingProfile));
+builder.Services.configureSwagger();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
+
 }
 
 app.UseCors("AllowOrigin");

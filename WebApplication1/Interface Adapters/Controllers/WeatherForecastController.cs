@@ -20,6 +20,8 @@ namespace WebApplication1.Controllers
 
         }
 
+
+
         private async Task<ActionResult<T>> HandleWeatherRecordsAsync<T>(Func<Task<T>> getRecordsFunc, string successMessage)
         {
             Response.Headers.Add("Content-Type", "application/json");
@@ -35,6 +37,13 @@ namespace WebApplication1.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all weather record for the offset pagination
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+
         [HttpGet]
         public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherDetails(int offset, int limit)
         {
@@ -43,6 +52,13 @@ namespace WebApplication1.Controllers
                 "Successfully returned records"
             );
         }
+
+        /// <summary>
+        /// Get all weather records for keyset pagination
+        /// </summary>
+        /// <param name="lastId"> id of the last retrieved entity </param>
+        /// <param name="limit"> amount of records to be recieved </param>
+        /// <returns></returns>
 
         [HttpGet("biggerThanId")]
         public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherDetailsBiggerThanLastId(int lastId, int limit)
@@ -53,6 +69,14 @@ namespace WebApplication1.Controllers
             );
         }
 
+        /// <summary>
+        ///  Get all weather records for keyset pagination in date range
+        /// </summary>
+        /// <param name="lastId"> id of the last retrieved entity </param>
+        /// <param name="limit"> amount of records to be recieved </param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         [HttpGet("inDateRange")]
         public async Task<ActionResult<List<WeatherRecordDTO>>> GetWeatherRecordsInDateRange(int lastId, int limit, DateTime startDate, DateTime endDate)
         {
@@ -62,6 +86,11 @@ namespace WebApplication1.Controllers
             );
         }
 
+
+        /// <summary>
+        /// Get record count from the database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("total")]
         public async Task<ActionResult<int>> GetTotalWeatherRecords()
         {
@@ -71,6 +100,12 @@ namespace WebApplication1.Controllers
             );
         }
 
+        /// <summary>
+        /// Get record count of record in database within specified date range
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         [HttpGet("totalInDateRange")]
         public async Task<ActionResult<int>> getTotalWeatherRecordsInDateRange(DateTime startDate, DateTime endDate)
         {
@@ -79,6 +114,12 @@ namespace WebApplication1.Controllers
                 "Successfully returned count for records within date range"
            );
         }
+
+        /// <summary>
+        /// Upload excel file to the database 
+        /// </summary>
+        /// <param name="file">Excel file of specific format</param>
+        /// <returns></returns>
 
         [HttpPost("upload/batch")]
         public async Task<ActionResult> UploadFileBatch(IFormFile file)
